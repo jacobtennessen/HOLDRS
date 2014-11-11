@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Getopt::Std;
 
-use vars qw($opt_s $opt_e $opt_c $opt_o $opt_m $opt_k $opt_n $opt_r $opt_t);
+use vars qw($opt_s $opt_e $opt_c $opt_o $opt_m $opt_k $opt_n $opt_r $opt_t $opt_v);
 
 # Usage
 my $usage = "
@@ -47,12 +47,13 @@ Usage: perl ReadJellyfishParallel.pl options
   -n	number of times a kmer must be seen in target sample [default = 2]
   -r	minimum ratio of kmer count in experimental samples to control samples [default = 2]
   -t	minimum t-statistic between count in experimental samples and count in control samples [default = 5]
+  -v	minimum proportion of experimental samples which must contain kmer [default = 0.5]
 ";
 
 #############
 
 # command line processing.
-getopts('s:e:c:o:m:k:n:r:t');
+getopts('s:e:c:o:m:k:n:r:t:v');
 die $usage unless ($opt_s);
 die $usage unless ($opt_e);
 die $usage unless ($opt_c);
@@ -63,12 +64,14 @@ my $kmersize;
 my $indcountthresh;
 my $ratiothresh;
 my $tstatthresh;
+my $minrefinds;
 
 $hashsize = $opt_m ? $opt_m : 10000000;
 $kmersize = $opt_k ? $opt_k : 31;
 $indcountthresh = $opt_n ? $opt_n : 2;
 $ratiothresh = $opt_r ? $opt_r : 2;
 $tstatthresh = $opt_t ? $opt_t : 5;
+$minrefinds = $opt_v ? $opt_v : 0.5;
 
 my %ref_inds;
 
@@ -98,7 +101,7 @@ unless ( open(OUT, ">$opt_o") ) {
     print "Cannot open file \"$opt_o\" to write to!!\n\n";
     exit;
 }
-print OUT "Kmer\tCount\tRefInds\tRefDepth\tAltInds\tAltDepth\tRatio\tTstat\n";
+print OUT "Kmer\tCount\tExpInds\tExpDepth\tControlInds\tControlDepth\tRatio\tTstat\n";
 
 my $bookmarkkmer = "n";
 
@@ -220,7 +223,7 @@ until ($seeninds >= 1) {
 		$checkdepthtotal += $c;
 	    }
 	}
-	if ($refindcount >= ($reftotal/2)) {
+	if ($refindcount >= ($reftotal*$minrefinds)) {
 	    until ((scalar (@refdepths)) >= $reftotal) {
 		push @refdepths, 0;
 	    }
@@ -299,8 +302,4 @@ sub stdev{
     my $std = ($sqtotal / ((scalar(@data))-1)) ** 0.5;
     return $std;
 }
-
-
-
-
 

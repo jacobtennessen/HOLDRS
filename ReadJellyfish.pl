@@ -35,7 +35,7 @@ One of these files is designated the 'target' sample from which candidate kmers 
 Some of these files are designated 'experimental samples' and others 'control samples'
 This program finds candidate kmers that are significantly more common in the experimental samples than in the control samples
 
-Usage: perl ReadJellyfishParallel.pl options
+Usage: perl ReadJellyfish.pl options
  required:
   -s	the target sample name
   -e	a file listing names of experimental samples

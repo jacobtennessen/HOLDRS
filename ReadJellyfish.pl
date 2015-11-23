@@ -53,7 +53,7 @@ Usage: perl ReadJellyfish.pl options
 #############
 
 # command line processing.
-getopts('s:e:c:o:m:k:n:r:t:v');
+getopts('s:e:c:o:m:k:n:r:t:v:');
 die $usage unless ($opt_s);
 die $usage unless ($opt_e);
 die $usage unless ($opt_c);
